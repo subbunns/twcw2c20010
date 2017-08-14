@@ -1,0 +1,4 @@
+#! /bin/bash
+
+#|curl -F 'input=<-' "http://opener.olery.com/ner"
+#end of file

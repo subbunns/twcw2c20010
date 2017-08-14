@@ -45,7 +45,7 @@ public class TWCW2V0010 {
 			
 			//CORPUS 1
 			//loadTargetEntities ("corpus_1");
-			loadTimeMLFiles("corpus_1");
+			processTimeMLFiles("corpus_1");
 			//loadGoldEvents ("corpus_1");
 			//CORPUS 2
 			//loadTimeMLFiles("corpus_2");
@@ -91,7 +91,8 @@ public class TWCW2V0010 {
 			 try {
 				 	BufferedReader in = new BufferedReader(
 					new InputStreamReader( new FileInputStream(file), "UTF8"));
-					
+				 	
+				 					
 				 	String fileLine;
 					String key;
 					//temporary object to store event JSON
@@ -166,27 +167,51 @@ public class TWCW2V0010 {
 		} 
 		
 	
-		private void loadTimeMLFiles(String corpusName) {
+		private void processTimeMLFiles(String corpusName) {
 			File TimeMLDir = new File (dataDir+ "/" + corpusName+ "/corpus_trackB_TimeML");
-			 if(TimeMLDir.isDirectory()) {
-				 //get list of TimeML files in the directory
-				 File [] files = TimeMLDir.listFiles();
-				 
-				 //output the TEXT element from the timeML files
-				 
-				 for (int i= 0;i< files.length;i++) {
-					
-					 processTMLFile(files[i]);
-					  /*if (i==0) {
-						  System.out.println(files[i].getName());
-						  readTMLFile(files[i]);
-					  }*/
-				 }		 
-			 }
-			 else System.out.println("Invalid Path: Not a directory for TimeML files");
+			JSONObject fileJson = null;
+			
+			try {
+			
+				File outFile = new File(dataDir + "/output/"+ corpusName + "_output.txt");
+				
+				//delete the output file if it exists
+				if (outFile.exists()) outFile.delete();
+				
+				Writer out = new BufferedWriter(new OutputStreamWriter( new FileOutputStream(outFile), "UTF8"));
+				
+				 if(TimeMLDir.isDirectory()) {
+					 //get list of TimeML files in the directory
+					 File [] files = TimeMLDir.listFiles();
+					 
+					 //output the TEXT element from the timeML files
+					 
+					 for (int i= 0;i< files.length;i++) {
+						
+						 //processTMLFile(files[i]);
+						 
+						 fileJson = processTMLFile(files[i]);
+						 out.append(fileJson.toString()+ System.lineSeparator());
+						 System.out.println("File written: " + files[i].getName());
+						 /* if (i< 2) {
+							  fileJson = processTMLFile(files[i]);
+							  out.append(fileJson.toString()+ System.lineSeparator());
+							  System.out.println("File written: " + files[i].getName());
+						  }*/
+					 }		 
+				 }
+				 else System.out.println("Invalid Path: Not a directory for TimeML files");
+				 out.flush();
+				 out.close();
+			}
+			catch (Exception e) {
+				 e.printStackTrace(); 
+			}
+			
 		}
 		//parsing and reading TimeML files to JSON
-		private void processTMLFile (File file) {
+		private JSONObject processTMLFile (File file) {
+			JSONObject jsonObj = null;
 			try { 
 				
 				
@@ -200,26 +225,30 @@ public class TWCW2V0010 {
 	            serializer.transform(new DOMSource(doc), new StreamResult(stw)); 
 	           
 	           
-	            JSONObject jsonObj = XML.toJSONObject(stw.toString(), true);  
+	            jsonObj = XML.toJSONObject(stw.toString(), true);  
 	          
 	           //get the text as its own object
 	            String rawText = getRawTextFromXml(stw.toString());
 	            jsonObj.accumulate("RAW TEXT", rawText);
 
-	            //System.out.println(jsonObj.toString(3));
-	            //System.out.println(getRawTextFromXml(stw.toString()));
-	            // GET TIPSem output for RAW TEXT
-	            
-	            
+	            JSONObject tipSem = XML.toJSONObject(getTIPSemOutput(rawText));
 	            //add Tipsem output to JSON String
-	            jsonObj.put("TIPSEM", XML.toJSONObject(getTIPSemOutput(rawText)));
+	            jsonObj.put("TIPSEM", tipSem);
+	            //System.out.println(jsonObj.toString(3));
+	           
+	            //add opeNER output
+	            //String cmdout = getOpeNERCData(rawText);
+	            //JSONObject tmpJSON = new JSONObject("{" + cmdout + "}");
+	            //System.out.println(cmdout);
+	            //jsonObj.put("OPENER",tmpJSON);
 	            System.out.println(jsonObj.toString(3));
-	            /*System.out.println("****RAW TEXT***");
-	            System.out.println(rawText);
-	            System.out.println("***TIPSem Output****");
-	            System.out.println(tipSemOutput);
-	            System.out.println("****JSON***");
-	            System.out.println(XML.toJSONObject(tipSemOutput).toString(3));*/
+		        
+	            
+	            //get word2vec scores
+	            //String cmdout = getWord2VecInfo(rawText);
+	            
+	            
+	         
 			}
 	         catch(IOException ex) {
 	                System.out.println(
@@ -230,8 +259,26 @@ public class TWCW2V0010 {
 	         } catch(Exception e) {  
 	                e.printStackTrace();  
 	            }
-	         
+			return jsonObj;
 	    }
+	private String getWord2VecInfo(String rawText) {
+		String str = "";
+		String cmdArray[] = {"python", "/home/osboxes/getannotations.py", rawText};
+		String cmdOutput = runCommand(cmdArray);
+		return cmdOutput;
+	}
+	private String getOpeNERCData(String rawText) {
+			//String cmdArray []= {"curl", "-d", "\"@-\"","http://opener.olery.com/language-identifier", "<<<",  "\"input="+ rawText + "\""};
+			String cmdArray []= {"/home/osboxes/ML/TCW2V0010/getOpeNEROutput.sh", rawText};
+			//System.out.println(cmdArray[0] + cmdArray[1]);
+			String cmdOutput = "";
+			// process the raw text thru the whole pipeline
+			
+			//first get the language identifier
+			cmdOutput = runCommand(cmdArray);
+			
+			return cmdOutput;
+		}
 		private String getTIPSemOutput(String rawText) {
 			String tipSemOutput = "";
 			try {
@@ -240,7 +287,7 @@ public class TWCW2V0010 {
 	            String cmdArray [] = {"java", "-jar", "/home/osboxes/ML/otip-master/target/tipsem-1.0.0.jar", "-t", rawText};
 	             tipSemOutput = runCommand (cmdArray);
 	        
-			}
+			} 
 			catch (Exception e) {
 				e.printStackTrace();
 			}
