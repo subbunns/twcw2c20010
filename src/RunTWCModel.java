@@ -6,7 +6,8 @@ public class RunTWCModel {
 	 */
 	
 	public static void main(String[] args) {
-		String dataDir = "/home/osboxes/ML/semeval-2015-task-4-master"; 
+		String dataDir = args[0];//"/home/osboxes/ML/semeval-2015-task-4-master"; 
+		
 		//log file name to log progress and errors
 		String logFile = "getResults.log";
 

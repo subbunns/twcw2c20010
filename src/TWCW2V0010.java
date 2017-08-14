@@ -46,18 +46,9 @@ public class TWCW2V0010 {
 			//CORPUS 1
 			//loadTargetEntities ("corpus_1");
 			processTimeMLFiles("corpus_1");
-			//loadGoldEvents ("corpus_1");
-			//CORPUS 2
-			//loadTimeMLFiles("corpus_2");
-			//loadGoldEvents ("corpus_2");
-			//loadTargetEntities ("corpus_2");
-			//System.out.println(corpusTopics.size());
-			//CORPUS 3
-			//loadTimeMLFiles("corpus_3");
-			//loadGoldEvents ("corpus_3");
-			//loadTargetEntities ("corpus_3");
-			//System.out.println(corpusTopics.size());
-			
+			processTimeMLFiles("corpus_2");
+			processTimeMLFiles("corpus_3");
+				
 		}
 		//loads all the gold time line files into a json array. Each file is loaded into a JSON object.
 		private void loadGoldEvents (String corpusName){
@@ -192,7 +183,7 @@ public class TWCW2V0010 {
 						 
 						 fileJson = processTMLFile(files[i]);
 						 out.append(fileJson.toString()+ System.lineSeparator());
-						 System.out.println("File written: " + files[i].getName());
+						 System.out.println("Processed File NO: " + (i+1) + "-" + files[i].getName());
 						 /* if (i< 2) {
 							  fileJson = processTMLFile(files[i]);
 							  out.append(fileJson.toString()+ System.lineSeparator());
@@ -241,7 +232,7 @@ public class TWCW2V0010 {
 	            //JSONObject tmpJSON = new JSONObject("{" + cmdout + "}");
 	            //System.out.println(cmdout);
 	            //jsonObj.put("OPENER",tmpJSON);
-	            System.out.println(jsonObj.toString(3));
+	            //System.out.println(jsonObj.toString(3));
 		        
 	            
 	            //get word2vec scores
@@ -336,7 +327,7 @@ public class TWCW2V0010 {
 
 	                        String line = reader.readLine();
 	                        
-	            System.out.println(line);
+	            //System.out.println(line);
 				while ((line = reader.readLine())!= null) {
 					//System.out.println(line);
 					output.append(line + "\n");

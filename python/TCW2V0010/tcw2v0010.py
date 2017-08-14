@@ -96,7 +96,7 @@ class tcw2v0010:
                 docVec = self.addVectors(docVec, word2vec)
             counter = counter + 1
     def createJSONfromFiles(self):
-        p= subprocess.Popen(java -jar /home/osboxes/)
+        p= subprocess.Popen(java -jar /home/osboxes/ML/)
 
 
 
