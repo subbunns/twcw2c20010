@@ -299,8 +299,8 @@ public class TWCW2V0010 {
 				textString = "";
 				NodeList sentenceList = doc.getElementsByTagName("s");
 				//first two sentence elements are the title and the date of the document. so ignore them
-				 for (int s = 2; s < sentenceList.getLength();s++ ) {
-					 if (s==2) textString += sentenceList.item(s).getTextContent(); else textString += " " + sentenceList.item(s).getTextContent();
+				 for (int s = 0; s < sentenceList.getLength();s++ ) {
+					 if (s==0) textString += sentenceList.item(s).getTextContent(); else textString += " " + sentenceList.item(s).getTextContent();
 					 //System.out.println(sentenceList.item(s).getTextContent());
 					 					
 				}

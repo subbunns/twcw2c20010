@@ -1,1 +1,1 @@
-from tcw2v0010 import tcw2v0010
+from tcw2v0010 import TcW2v0010
