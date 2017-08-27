@@ -1,3 +1,6 @@
+#Author: Subramanian Narasimhan
+#Summer: 2017
+
 import sys
 import os
 from TCW2V0010 import TcW2v0010

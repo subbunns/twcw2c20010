@@ -1,3 +1,10 @@
+#Author: Subramanian Narasimhan
+#Summer: 2017
+#implements a model for cross document event ordering using word2vec
+# for local testing instead of the word2vec on the wikipedia corpus, the Stanford Glove data was used.
+# The tipsem portion can be tested quickly by just disabled the initialation of the Glove model in the constructor
+# of the class.
+
 import sys
 import nltk
 import json
